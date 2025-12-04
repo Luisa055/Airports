@@ -5,7 +5,9 @@
 package br.eti.lda.airports.service;
 
 import br.eti.lda.airports.DTO.AirportMinDTO;
+import br.eti.lda.airports.DTO.AirportNearMeDTO;
 import br.eti.lda.airports.entities.Airport;
+import br.eti.lda.airports.projections.AirportNearMeProjection;
 import br.eti.lda.airports.repositories.AirportRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,4 +45,22 @@ public class AirportService {
         Airport result = airportRepository.findByIataCode(iataCode);
         return result;
     }
+
+/**
+ * Retorna uma lista de aeroportos próximos (DID AirportNearthe)
+ *
+ * @param latitude Latitude
+ * @param longitude Longitude
+ * @return Lista de DTOs de aeroportos próximos
+ */
+public List<AirportNearMeDTO> findNearMe(double latitude, double longitude) {
+    List<AirportNearMeProjection> resultNearAirports = airportRepository.findNearMe(latitude, longitude);
+
+    List<AirportNearMeDTO> resultDTO = resultNearAirports.stream()
+            .map(x -> new AirportNearMeDTO(x))
+            .toList();
+
+    return resultDTO;
+}
+
 }

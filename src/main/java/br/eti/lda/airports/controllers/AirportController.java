@@ -4,6 +4,7 @@
  */
 package br.eti.lda.airports.controllers;
 
+import br.eti.lda.airports.DTO.AirportNearMeDTO;
 import br.eti.lda.airports.entities.Airport;
 import br.eti.lda.airports.service.AirportService;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -59,9 +61,10 @@ public class AirportController {
             return ResponseEntity.ok(result);
         }
     }
-@GetMapping("/iatacode/{iataCode}")
+
+    @GetMapping("/iatacode/{iataCode}")
     public ResponseEntity<Airport> findByIataCode(@PathVariable String iataCode) {
-       Airport result = airportService.findByIataCode(iataCode);
+        Airport result = airportService.findByIataCode(iataCode);
 
         if (result == null) {
 
@@ -72,4 +75,34 @@ public class AirportController {
         }
     }
 
+    public AirportController(AirportService airportService) {
+        this.airportService = airportService;
+    }
+
+    /**
+     * Endpoint /airports/nearme Retorna os aeroportos próximos a coordenada
+     * enviada como parâmetro da requisição GET.
+     *
+     * @param latitude
+     * @param longitude
+     * @return
+     */
+    @GetMapping("/nearme")
+    public ResponseEntity<List<AirportNearMeDTO>> findNearMe(
+            @RequestParam double latitude,
+            @RequestParam double longitude) {
+
+        List<AirportNearMeDTO> result = airportService.findNearMe(latitude, longitude);
+
+        if (result.isEmpty()) {
+            // Ops.. lista vazia...
+            // not Found devolve 404
+            return ResponseEntity.notFound().build();
+        } else {
+            // Eba! Tem dados!
+            // ok devolve 200
+            return ResponseEntity.ok(result);
+        }
+    }
 }
+
